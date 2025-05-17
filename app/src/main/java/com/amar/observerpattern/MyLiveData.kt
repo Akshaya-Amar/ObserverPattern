@@ -1,6 +1,10 @@
 package com.amar.observerpattern
 
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
+
 class MyLiveData<T> {
+
      private val observers = mutableListOf<MyObserver<T>>()
      private var data: T? = null
 
@@ -8,14 +12,16 @@ class MyLiveData<T> {
           observers.add(observer)
      }
 
-     fun setValue(value: T) {
+     fun setValue(value: T, owner: LifecycleOwner) {
           data = value
-          dispatchValue()
+          if (owner.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
+               dispatchValue()
+          }
      }
 
      private fun dispatchValue() {
-          observers.forEach { observer ->
-               notify(observer)
+          observers.forEach { myObserver ->
+               notify(myObserver)
           }
      }
 
